@@ -5,7 +5,7 @@
 {% block content %}
 	<h2>{{ question }}</h2>
 	<a>{{ question.text }}</a>
-	{% for obj in answer %}
+	{% for obj in answers %}
 	<div class="answer">
 		<a>{{ obj }}</a>
 		<!-- {{ obj.created_date|date:"d.m.Y" }} -->
