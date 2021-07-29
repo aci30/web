@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 class QuestionManager(models.Manager):
 	def new(self):
-		return self.order_by('-pk')
+		return self.order_by('-id')
 	def popular(self):
 		return self.order_by('-rating')
 
@@ -29,3 +29,6 @@ class Answer(models.Model):
 	added_at = models.DateTimeField(auto_now_add=True, null=True)
 	question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
 	author = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+
+	def __str__(self):
+		return self.text

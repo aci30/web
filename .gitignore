@@ -1,3 +1,5 @@
 ask/secret_key.py
 ask/server.py
-public/
+public/*
+*.pyo
+*.pyc

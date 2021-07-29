@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}
+	{{ question|slice:"7" }}
+{% endblock %}
+{% block content %}
+	<h2>{{ question }}</h2>
+	<a>{{ question.text }}</a>
+	{% for obj in answer %}
+	<div class="answer">
+		<a>{{ obj }}</a>
+		<!-- {{ obj.created_date|date:"d.m.Y" }} -->
+	</div>
+	{% endfor %}
+{% endblock %}
