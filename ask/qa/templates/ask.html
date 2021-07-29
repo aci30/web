@@ -1,27 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}
-	{{ question|truncatechars:"20" }}
+    {{ block.super }} – ask a question
 {% endblock %}
 {% block content %}
-	<link href='http://127.0.0.1/css/bootstrap.css' rel="stylesheet" type="text/css">
+    <link href='http://127.0.0.1/css/bootstrap.css' rel="stylesheet" type="text/css">
 
-	<h2>{{ question }}</h2>
-	<p>{{ question.text }}</p>
-	<p></p>
-	<hr>
-	{% for obj in answers %}
-	<div class="answer">
-		<p>{{ obj }}</p>
-		<!-- {{ obj.added_at|date:"d.m.Y" }} -->
-	</div>
-	{% endfor %}
-	<hr>
-	
-	<p>Add new answer</p>
     {% for e in form.non_field_errors %}
         <div class="alert alert-danger">{{ e }}</div>
     {% endfor %}
-    <form class="form-horizontal" method="post" action="{{ question.build_url }}">{% csrf_token %}
+    <form class="form-horizontal" method="post" action="/ask/">{% csrf_token %}
         <fieldset>
             {% for field in form %}
             <div class="control-group
@@ -35,4 +22,5 @@
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </form>
+
 {% endblock %}
