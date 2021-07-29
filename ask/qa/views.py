@@ -45,7 +45,6 @@ def question(request, id):
         if form.is_valid():
             answer = form.save()
             url = question.build_url()
-            print(f'redirected to {url}')
             return HttpResponseRedirect(url)
     else:
         form = AnswerForm(initial={'question': question.id})

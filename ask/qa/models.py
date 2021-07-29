@@ -16,7 +16,7 @@ class Question(models.Model):
     added_at = models.DateTimeField(auto_now_add=True, null=True)
     rating = models.IntegerField(default=0)
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
-    likes = models.ManyToManyField(User, related_name='question_likes_user', null=True)
+    likes = models.ManyToManyField(User, related_name='question_likes_user')
 
     def build_url(self):
         return reverse('question', kwargs={'id': self.id})
