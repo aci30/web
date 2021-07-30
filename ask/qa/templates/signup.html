@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ block.super }} – login page
+{% endblock %}
+{% block content %}
+    <link href='http://127.0.0.1/css/bootstrap.css' rel="stylesheet" type="text/css">
+    {% for obj in questions %}
+    <div class="question">
+        <a href="{{ obj.build_url }}">{{ obj }}</a>
+        <!-- {{ obj.created_date|date:"d.m.Y" }} -->
+    </div>
+    {% endfor %}
+
+    <p>Signup form</p>
+    {% for e in form.non_field_errors %}
+        <div class="alert alert-danger">{{ e }}</div>
+    {% endfor %}
+    <form class="form-horizontal" method="post" action="/signup/">{% csrf_token %}
+        <fieldset>
+            {% for field in form %}
+            <div class="control-group
+                {% if field.errors %}has-error{% endif %}">
+                {{ field.errors }}
+                <label class="control-label">{{ field.label }}</label>
+                <div class="controls">{{ field }}</div>
+            </div>
+            {% endfor %}
+        </fieldset>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Signup</button>
+        </div>
+    </form>
+{% endblock %}

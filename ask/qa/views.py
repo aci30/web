@@ -2,9 +2,12 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator
 from django.urls import reverse
-from qa.models import Question, Answer
-from qa.forms import AskForm, AnswerForm
+from qa.models import Question, Answer, User, Session
+from qa.forms import AskForm, AnswerForm, SignupForm
 from django.http import HttpResponse, HttpResponseRedirect
+
+from hashlib import sha256
+import random, string, datetime
 
 def test(request, *args, **kwargs):
     return HttpResponse('OK')
@@ -66,3 +69,70 @@ def ask(request):
     return render(request, 'ask.html', {
             'form': form,
         })
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            session_id, session_expires = do_login(
+                    form.cleaned_data['username'], form.cleaned_data['password']
+                )
+            if session_id:
+                response = HttpResponseRedirect('/')
+                response.set_cookie('sessionid', session_id,
+                        path='/', httponly=True,
+                        expires = session_expires
+                    )
+                return response
+            else:
+                form.add_error(None, 'Invalid username / password')
+    else:
+        form = SignupForm()
+    return render(request, 'signup.html', {
+            'form': form,
+        })
+
+def login(request):
+    error = ''
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        url = request.POST.get('continue', '/')
+        session_id, session_expires = do_login(username, password)
+        if session_id:
+            response = HttpResponseRedirect(url)
+            response.set_cookie('sessionid', session_id,
+                    path='/', httponly=True,
+                    expires = session_expires
+                )
+            return response
+        else:
+            error = 'Invalid username / password'
+    return render(request, 'login.html', {'error': error })
+
+def do_login(username, password):
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return None, None
+    if user.password != password:
+        return None, None
+    session = Session()
+    session.key = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32))
+    session.user = user
+    session.expires = datetime.datetime.now() + datetime.timedelta(days=1)
+    session.save()
+    return session.key, session.expires
+
+def logout(request):
+    session_id = request.COOKIES.get('sessionid')
+    if session_id is not None:
+        Session.objects.filter(key=session_id).delete()
+    url = request.GET.get('continue', '/')
+    response = HttpResponseRedirect(url)
+    response.set_cookie('sessionid', session_id,
+                    path='/', httponly=True,
+                    expires = datetime.datetime.now() - datetime.timedelta(days=999)
+                )
+    return response
