@@ -1,4 +1,4 @@
-from qa.models import User, Session
+from qa.models import Session
 from datetime import datetime
 
 class CheckSessionMiddleware():

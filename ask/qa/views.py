@@ -2,9 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator
 from django.urls import reverse
-from qa.models import Question, Answer, User, Session
+from qa.models import Question, Answer, Session
 from qa.forms import AskForm, AnswerForm, SignupForm
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.models import User
 
 from hashlib import sha256
 import random, string, datetime
@@ -45,8 +46,13 @@ def question(request, id):
     answers = Answer.objects.filter(question=id)
     if request.method == 'POST':
         form = AnswerForm(request.POST)
+        form._user = request.user
         if form.is_valid():
-            answer = form.save()
+            answer = Answer.objects.create(
+                text = form.cleaned_data['text'],
+                question = Question.objects.get(id=form.cleaned_data['question']),
+                author = form._user
+            )
             url = question.build_url()
             return HttpResponseRedirect(url)
     else:
@@ -60,8 +66,13 @@ def question(request, id):
 def ask(request):
     if request.method == 'POST':
         form = AskForm(request.POST)
+        form._user = request.user
         if form.is_valid():
-            question = form.save()
+            question = Question.objects.create(
+                title = form.cleaned_data['title'],
+                text = form.cleaned_data['text'],
+                author = form._user
+            )
             url = question.build_url()
             return HttpResponseRedirect(url)
     else:

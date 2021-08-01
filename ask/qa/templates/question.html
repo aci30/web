@@ -7,11 +7,13 @@
 
 	<h2>{{ question }}</h2>
 	<p>{{ question.text }}</p>
-	<p></p>
+	<p>Author: {{ question.author }}</p>
 	<hr>
 	{% for obj in answers %}
 	<div class="answer">
 		<p>{{ obj }}</p>
+		<p>{{ obj.author }}</p>
+		<hr>
 		<!-- {{ obj.added_at|date:"d.m.Y" }} -->
 	</div>
 	{% endfor %}
@@ -23,7 +25,10 @@
     {% endfor %}
     <form class="form-horizontal" method="post" action="{{ question.build_url }}">{% csrf_token %}
         <fieldset>
-            {% for field in form %}
+        	{% for field in form.hidden_fields %}
+        		{{ field }}
+        	{% endfor %}
+            {% for field in form.visible_fields %}
             <div class="control-group
                 {% if field.errors %}has-error{% endif %}">
                 <label class="control-label">{{ field.label }}</label>

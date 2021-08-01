@@ -1,16 +1,15 @@
 from django.db import models
 from django.urls import reverse
-#from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 
 # Create your models here.
-class User(models.Model):
-    username = models.CharField(unique=True, max_length=20)
-    email = models.EmailField()
-    password = models.CharField(max_length=255)
+# class User(models.Model):
+#     username = models.CharField(unique=True, max_length=20)
+#     email = models.EmailField()
+#     password = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.username
-
+#     def __str__(self):
+#         return self.username
 
 class Session(models.Model):
     key = models.CharField(unique=True, max_length=255)
