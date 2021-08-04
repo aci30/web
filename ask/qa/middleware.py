@@ -1,5 +1,5 @@
 from qa.models import Session
-from datetime import datetime
+from django.utils import timezone
 
 class CheckSessionMiddleware():
     def __init__(self, get_response):
@@ -10,7 +10,7 @@ class CheckSessionMiddleware():
             session_id = request.COOKIES.get('sessionid')
             session = Session.objects.get(
                     key=session_id,
-                    expires__gt=datetime.now(),
+                    expires__gt=timezone.now(),
                 )
             request.session = session
             request.user = session.user

@@ -40,7 +40,7 @@ class Question(models.Model):
 class Answer(models.Model):
     text = models.TextField(default='a_placeholder')
     added_at = models.DateTimeField(auto_now_add=True, null=True)
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True)
 
     def __str__(self):

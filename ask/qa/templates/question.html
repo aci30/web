@@ -8,11 +8,17 @@
 	<h2>{{ question }}</h2>
 	<p>{{ question.text }}</p>
 	<p>Author: {{ question.author }}</p>
+	{% if question.author == request.user %}
+		<a href="/delete/?type=question&id={{question.id}}" class="btn-sm btn-danger">Delete</a>
+	{% endif %}
 	<hr>
 	{% for obj in answers %}
 	<div class="answer">
 		<p>{{ obj }}</p>
 		<p>{{ obj.author }}</p>
+		{% if obj.author == request.user %}
+			<a href="/delete/?type=answer&id={{obj.id}}" class="btn-sm btn-danger">Delete</a>
+		{% endif %}
 		<hr>
 		<!-- {{ obj.added_at|date:"d.m.Y" }} -->
 	</div>

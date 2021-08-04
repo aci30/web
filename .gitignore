@@ -2,6 +2,7 @@ ask/secret_key.py
 ask/server.py
 ask/server2.py
 ask/server3.py
+ask/qa/migrations/*
 public/*
 *.pyo
 *.pyc

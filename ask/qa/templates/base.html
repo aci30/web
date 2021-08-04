@@ -4,18 +4,56 @@
 		{% block extrahead %}{% endblock %}
 	</head>
 	<body>
-		{% if not request.user == None %}
-			<div>
-				Hello, {{ request.user }} <a href="/logout/?continue={{ request.path }}">Logout</a>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="/">Q&A</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+					<ul class="navbar-nav">
+						<li class="nav-item 
+							{% if request.path == '/' %} 
+								active
+							{% endif %}">
+							<a class="nav-link" href="/">Main page</a>
+						</li>
+						<li class="nav-item 
+							{% if request.path == '/popular/' %} 
+								active
+							{% endif %}">
+							<a class="nav-link" href="/popular">Popular</a>
+						</li>
+						<li class="nav-item 
+							{% if request.path == '/ask/' %} 
+								active
+							{% endif %}">
+							<a class="nav-link" href="/ask">Ask</a>
+						</li>
+					</ul>
+					<ul class="navbar-nav ms-auto">
+						{% if not request.user == None %}
+						<li class="nav-item">
+							<a class="nav-link" href="/user/{{request.user}}">{{request.user}}</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/logout/?continue={{ request.path }}">Logout</a>
+						</li>
+						{% else %}
+						<li class="nav-item">
+							<a class="nav-link" href="/login">Login</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/signup">Signup</a>
+						</li>
+						{% endif %}
+					</ul>
+				</div>
 			</div>
-		{% else %}
-			<div>Hello, guest! <a href="/login">Login</a> <a href="/signup">Signup</a></div>
-		{% endif %}
-		<hr>
-		<div><a href="/">/</a></div>
-		<div><a href="/popular">/popular</a></div>
-		<hr>
-		{% block content %}{% endblock %}
+		</nav>
+	
+		{% block content %}
+		{% endblock %}
 	
 	</body>
 </html>

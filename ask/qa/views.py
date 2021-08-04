@@ -4,11 +4,13 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from qa.models import Question, Answer, Session
 from qa.forms import AskForm, AnswerForm, SignupForm
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 from hashlib import sha256
-import random, string, datetime
+import random, string
 
 def test(request, *args, **kwargs):
     return HttpResponse('OK')
@@ -66,7 +68,10 @@ def question(request, id):
 def ask(request):
     if request.method == 'POST':
         form = AskForm(request.POST)
-        form._user = request.user
+        if request.user == None:
+            return HttpResponseRedirect('/login')
+        else:
+            form._user = request.user
         if form.is_valid():
             question = Question.objects.create(
                 title = form.cleaned_data['title'],
@@ -132,7 +137,7 @@ def do_login(username, password):
     session = Session()
     session.key = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32))
     session.user = user
-    session.expires = datetime.datetime.now() + datetime.timedelta(days=1)
+    session.expires = timezone.now() + timedelta(days=1)
     session.save()
     return session.key, session.expires
 
@@ -144,6 +149,36 @@ def logout(request):
     response = HttpResponseRedirect(url)
     response.set_cookie('sessionid', session_id,
                     path='/', httponly=True,
-                    expires = datetime.datetime.now() - datetime.timedelta(days=999)
+                    expires = timezone.now() - timedelta(days=999)
                 )
     return response
+
+def delete(request):
+    type = request.GET.get('type', '')
+    id = request.GET.get('id', '')
+    response = HttpResponseNotFound(r'i dont understand you')
+    if type == 'question' and id:
+        response = delete_question(type, id, request.user)
+    if type == 'answer' and id:
+        response = delete_answer(type, id, request.user)
+    return response
+    
+def delete_question(type, id, user):
+    try:
+        question = Question.objects.get(id=id)
+    except Question.DoesNotExist:
+        return HttpResponseNotFound(r'cant delete question {id} cuz it DoesNotExist')
+    if user != question.author:
+        return HttpResponseRedirect(question.build_url())
+    question.delete()
+    return HttpResponseRedirect('/')
+
+def delete_answer(type, id, user):
+    try:
+        answer = Answer.objects.get(id=id)
+    except Answer.DoesNotExist:
+        return HttpResponseNotFound(r'cant delete answer {id} cuz it DoesNotExist')
+    if user != answer.author:
+        return HttpResponseRedirect(answer.question.build_url())
+    answer.delete()
+    return HttpResponseRedirect(answer.question.build_url())

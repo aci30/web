@@ -1,27 +1,42 @@
 {% extends 'base.html' %}
 {% block title %}
-	{{ block.super }} – main page
+	{{ block.super }} – 
+		{% if request.path == '/' %}
+			main 
+		{% elif request.path == '/popular/' %}
+			popular
+		{% endif %} 
+		page
 {% endblock %}
 {% block content %}
 	<link href='http://127.0.0.1/css/bootstrap.css' rel="stylesheet" type="text/css">
+	<div class="container mr-100 border">
 	{% for obj in questions %}
-	<div class="question">
-		<a href="{{ obj.build_url }}">{{ obj }}</a>
-		<!-- {{ obj.created_date|date:"d.m.Y" }} -->
+		<div class="row border">
+			<div class="container-sm">
+				<a href="{{ obj.build_url }}">{{ obj.title }}</a>
+			</div>
+			<div class="container-sm">
+				<p class="text-break">{{ obj.text }}</p>
+			</div>
+			<!-- {{ obj.added_at|date:"d.m.Y" }} -->
+		</div>
+	{% endfor %}
 	</div>
-	{% endfor %}
 
-	<nav><ul class="pagination">
-	{% for p in paginator.page_range %}
-		{% if p == page.number %}
-		<li class="active">
-		{% else %}
-		<li>
-		{% endif %}
-			<a href="{{ paginator.baseurl }}?page={{ p }}">
-			{{ p }}</a>
-		</li>
-	{% endfor %}
-	</ul></nav>
+	<nav>
+		<ul class="pagination pagination-md">
+			{% for p in paginator.page_range %}
+				{% if p == page.number %}
+					<li class="page-item active" aria-current="page">
+				{% else %}
+					<li class="page-item">
+				{% endif %}
+				<a class="page-link" href="{{ paginator.baseurl }}?page={{ p }}">
+				{{ p }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</nav>
 	<!-- <script src="http://127.0.0.1/js/bootstrap.bundle.min.js"></script> -->
 {% endblock %}
