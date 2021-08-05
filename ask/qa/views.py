@@ -2,10 +2,12 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET
 from django.core.paginator import Paginator
 from django.urls import reverse
-from qa.models import Question, Answer, Session
+from qa.models import Question, Answer
 from qa.forms import AskForm, AnswerForm, SignupForm
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
 
@@ -65,13 +67,11 @@ def question(request, id):
             'form': form
         })
 
+@login_required(redirect_field_name='continue')
 def ask(request):
     if request.method == 'POST':
         form = AskForm(request.POST)
-        if request.user == None:
-            return HttpResponseRedirect('/login')
-        else:
-            form._user = request.user
+        form._user = request.user
         if form.is_valid():
             question = Question.objects.create(
                 title = form.cleaned_data['title'],
@@ -86,72 +86,39 @@ def ask(request):
             'form': form,
         })
 
-def signup(request):
+def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
-            session_id, session_expires = do_login(
-                    form.cleaned_data['username'], form.cleaned_data['password']
-                )
-            if session_id:
-                response = HttpResponseRedirect('/')
-                response.set_cookie('sessionid', session_id,
-                        path='/', httponly=True,
-                        expires = session_expires
-                    )
-                return response
-            else:
-                form.add_error(None, 'Invalid username / password')
+            login(request, user)
+            return HttpResponseRedirect('/')
+        else:
+            form.add_error(None, 'Invalid username / password')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {
             'form': form,
         })
 
-def login(request):
+def login_view(request):
     error = ''
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        url = request.POST.get('continue', '/')
-        session_id, session_expires = do_login(username, password)
-        if session_id:
-            response = HttpResponseRedirect(url)
-            response.set_cookie('sessionid', session_id,
-                    path='/', httponly=True,
-                    expires = session_expires
-                )
-            return response
+        url = request.GET.get('continue', '/')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(url)
         else:
             error = 'Invalid username / password'
     return render(request, 'login.html', {'error': error })
 
-def do_login(username, password):
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return None, None
-    if user.password != password:
-        return None, None
-    session = Session()
-    session.key = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32))
-    session.user = user
-    session.expires = timezone.now() + timedelta(days=1)
-    session.save()
-    return session.key, session.expires
-
-def logout(request):
-    session_id = request.COOKIES.get('sessionid')
-    if session_id is not None:
-        Session.objects.filter(key=session_id).delete()
+def logout_view(request):
+    logout(request)
     url = request.GET.get('continue', '/')
-    response = HttpResponseRedirect(url)
-    response.set_cookie('sessionid', session_id,
-                    path='/', httponly=True,
-                    expires = timezone.now() - timedelta(days=999)
-                )
-    return response
+    return HttpResponseRedirect(url)
 
 def delete(request):
     type = request.GET.get('type', '')
@@ -182,3 +149,14 @@ def delete_answer(type, id, user):
         return HttpResponseRedirect(answer.question.build_url())
     answer.delete()
     return HttpResponseRedirect(answer.question.build_url())
+
+@login_required(redirect_field_name='continue')
+def user_view(request, nickname):
+    user = get_object_or_404(User, username=nickname)
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+    return render(request, 'user.html', {
+            'user': user,
+        })

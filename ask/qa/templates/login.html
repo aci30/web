@@ -3,7 +3,6 @@
     {{ block.super }} – login page
 {% endblock %}
 {% block content %}
-    <link href='http://127.0.0.1/css/bootstrap.css' rel="stylesheet" type="text/css">
     {% for obj in questions %}
     <div class="question">
         <a href="{{ obj.build_url }}">{{ obj }}</a>
@@ -15,7 +14,7 @@
     {% if error %}
     <div class="alert alert-danger">{{ error }}</div>
     {% endif %}
-    <form class="form-horizontal" method="post" action="/login/">{% csrf_token %}
+    <form class="form-horizontal" method="post" action="{{ request.get_full_path }}">{% csrf_token %}
         <fieldset>
             <div class="control-group">
                 <label class="control-label">Username</label>

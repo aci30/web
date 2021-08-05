@@ -1,11 +1,12 @@
 from django import forms
-from qa.models import Question, Answer, User
+from qa.models import Question, Answer
+from django.contrib.auth.models import User
 
 from hashlib import sha256
 
 class AskForm(forms.Form):
     title = forms.CharField(max_length=50, label='Title')
-    text = forms.CharField(label='Question')
+    text = forms.CharField(label='Question', widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
         super(AskForm, self).__init__(*args, **kwargs)
@@ -53,9 +54,4 @@ class SignupForm(forms.Form):
         pass
 
     def save(self):
-        # return User.objects.create(
-        #         username=self.cleaned_data['username'],
-        #         password=sha256(self.cleaned_data['password'].encode('utf-8')).digest(),
-        #         email=self.cleaned_data['email'],
-        #     )
-        return User.objects.create(**self.cleaned_data)
+        return User.objects.create_user(**self.cleaned_data)

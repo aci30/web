@@ -49,7 +49,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'qa.middleware.CheckSessionMiddleware',
 ]
 
 ROOT_URLCONF = 'ask.urls'
@@ -124,3 +123,5 @@ USE_TZ = True
 
 #STATIC_URL = os.path.join(os.path.dirname(BASE_DIR), 'public/')
 STATIC_URL = '/static/'
+
+LOGIN_URL = '/login/'

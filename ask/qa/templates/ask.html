@@ -3,8 +3,6 @@
     {{ block.super }} – ask a question
 {% endblock %}
 {% block content %}
-    <link href='http://127.0.0.1/css/bootstrap.css' rel="stylesheet" type="text/css">
-
     {% for e in form.non_field_errors %}
         <div class="alert alert-danger">{{ e }}</div>
     {% endfor %}

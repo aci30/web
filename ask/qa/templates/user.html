@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ question|truncatechars:"20" }}
+{% endblock %}
+{% block content %}
+    <h4>Username: {{ user }}</h4>
+    <a href="/user/{{user.username}}/questions" class="btn-lg btn-primary">My questions</a>
+    <hr>
+{% endblock %}

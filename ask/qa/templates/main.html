@@ -9,21 +9,25 @@
 		page
 {% endblock %}
 {% block content %}
-	<link href='http://127.0.0.1/css/bootstrap.css' rel="stylesheet" type="text/css">
-	<div class="container mr-100 border">
-	{% for obj in questions %}
-		<div class="row border">
-			<div class="container-sm">
-				<a href="{{ obj.build_url }}">{{ obj.title }}</a>
-			</div>
-			<div class="container-sm">
-				<p class="text-break">{{ obj.text }}</p>
-			</div>
-			<!-- {{ obj.added_at|date:"d.m.Y" }} -->
-		</div>
-	{% endfor %}
-	</div>
 
+	<div class="container border">
+	    <div class="row">
+            <div class="col-10">
+            	{% for obj in questions %}
+	                <div style="height: 200px;" class="mx-2 my-2 p-3 border">
+	                    <h2><a href="{{ obj.build_url }}">{{ obj.title }}</a></h2>
+	                    <div>
+							{{ obj.text }}
+						</div>
+	                    <p class="py-1">Added at: {{ obj.added_at|date:"d.m.y" }}</p>
+	                </div>
+	            {% endfor %}
+            </div>
+            <div class="col-2">
+
+            </div>
+	    </div>
+	</div>
 	<nav>
 		<ul class="pagination pagination-md">
 			{% for p in paginator.page_range %}
